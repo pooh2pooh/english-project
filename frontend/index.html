@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Интерактивная платформа — Frontend</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <style>
+    :root{
+      --bg1:#ffffff;--bg2:#bed7e0;--bg3:#d3e4ec;
+      --card:rgba(255,255,255,.08);
+      --accent:#00c6ff;--accent2:#0072ff;--success:#009f60;--danger:#ff6b6b;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:'Inter',sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));color:#303030;min-height:100vh}
+    .container{max-width:1100px;margin:auto;padding:20px}
+    .card{background:var(--card);backdrop-filter:blur(14px);border-radius:22px;padding:24px;margin-bottom:24px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+    h1,h2,h3{margin-top:0}
+    button{border:none;border-radius:14px;padding:10px 16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;transition:.12s}
+    button:hover{transform:translateY(-2px)}
+    input,select,textarea{width:100%;padding:10px;border-radius:12px;border:none;margin:6px 0 12px;font-family:inherit}
+    .progress{margin-top:16px;margin-bottom:16px;height:10px;background:rgba(255,255,255,.2);border-radius:10px;overflow:hidden}
+    .progress div{height:100%;background:linear-gradient(135deg,var(--success),#00cc66)}
+    .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+    .stats{display:flex;gap:14px;flex-wrap:wrap;font-weight:600}
+    .badge{background:white;color:#000;border-radius:12px;padding:4px 10px;font-size:12px;font-weight:800;margin:4px;display:inline-flex;align-items:center;gap:8px}
+    .badge .icon{font-size:16px}
+    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
+    .item{background:#fff;color:#000;padding:8px 12px;border-radius:8px;margin:4px;cursor:grab;display:inline-block;transition:.12s;touch-action:none}
+    .item.dragging-item{opacity:0.6;transform:scale(.98);box-shadow:0 6px 20px rgba(0,0,0,.35)}
+    .dropzone{min-height:42px;border:2px dashed rgba(255,255,255,.4);border-radius:12px;padding:10px;margin-bottom:10px;transition:.12s;display:flex;align-items:center;justify-content:space-between;overflow:hidden}
+    .dropzone.drag-over{border-color:var(--accent);background:rgba(0,198,255,0.06);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.28)}
+    .dropzone.filled{border-color:rgba(0,255,153,0.9);background:rgba(0,255,153,0.04);box-shadow:0 8px 24px rgba(0,0,0,.18)}
+    /* vertical layout for dropzone (used under images) */
+    .dropzone.vertical{flex-direction:column;align-items:center;gap:8px;padding:12px}
+    .dropzone.vertical img{max-width:100%;height:auto;max-height:200px;border-radius:10px;object-fit:cover}
+    .dropzone.vertical b{display:block;margin-top:6px;word-break:break-word;text-align:center;max-width:100%}
+    .dropzone b{white-space:normal}
+    .result.success{color:var(--success);font-weight:800}
+    .result.fail{color:var(--danger);font-weight:800}
+
+    /* Modal */
+    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000}
+    .modal{background:#0b1220;padding:18px;border-radius:12px;min-width:320px;color:#fff}
+    .modal h4{margin:0 0 12px}
+    .modal .controls{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
+    .modal .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .modal .badge-option{padding:8px;border-radius:8px;background:rgba(255,255,255,0.04);cursor:pointer;display:flex;gap:8px;align-items:center}
+    .modal .badge-option.selected{outline:2px solid var(--accent);transform:translateY(-2px)}
+    .modal .badge-icon{font-size:18px}
+    .teacher-create-badge{display:flex;gap:8px;flex-wrap:wrap}
+    .teacher-create-badge input{flex:1;min-width:140px}
+    @media(max-width:600px){.container{padding:12px}}
+
+    /* touch ghost */
+    .touch-ghost {
+      position: fixed;
+      pointer-events: none;
+      background: #fff;
+      color: #000;
+      padding: 8px 10px;
+      border-radius: 8px;
+      transform: translate(-50%, -50%);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      z-index: 20000;
+      font-weight:700;
+      white-space: nowrap;
+      opacity: 0.95;
+      font-size: 14px;
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <!-- LOGIN -->
+    <transition name="fade">
+      <div v-if="!user" class="container">
+        <div class="card" style="max-width:420px;margin:12vh auto">
+          <h2>Вход</h2>
+          <input v-model="login" placeholder="Логин" />
+          <select v-model="role">
+            <option value="student">Студент</option>
+            <option value="teacher">Преподаватель</option>
+          </select>
+          <button @click="auth">Войти</button>
+        </div>
+      </div>
+    </transition>
+
+    <!-- STUDENT -->
+    <div v-if="user && role==='student'" class="container">
+      <div class="topbar">
+        <h2>Панель студента — {{user.login}}</h2>
+        <button style="background:#950a0a" @click="logout">Выйти</button>
+      </div>
+
+      <div class="stats">
+        <span>⭐ XP {{xp}}</span>
+        <span>🏆 Уровень {{level}}</span>
+        <span>🔥 Серия {{streak}}</span>
+        <span>🧬 Комбо x{{combo}}</span>
+      </div>
+
+      <div class="progress"><div :style="{width:progress+'%'}"></div></div>
+
+      <!-- Student badges: show icon (from availableBadges mapping) -->
+      <div class="card" v-if="user.badges && user.badges.length">
+        <h3>Ачивки</h3>
+        <div>
+          <span v-for="b in user.badges" :key="b" class="badge">
+            <span class="icon">{{badgeIconFromTitle(b)}}</span>
+            <span>{{b}}</span>
+          </span>
+        </div>
+      </div>
+
+      <transition name="fade">
+        <div v-if="!activeTask && !result">
+          <h3>Задания курса</h3>
+          <div class="grid">
+            <div v-for="t in tasks" :key="t.id" class="card">
+              <h4>{{t.title}}</h4>
+              <p>{{t.desc}}</p>
+              <button @click="startTask(t)">Начать</button>
+              <span v-if="completedSet.has(t.id)" style="margin-left:10px;color:var(--success);font-weight:700">✔ пройдено</span>
+            </div>
+          </div>
+        </div>
+      </transition>
+
+      <!-- Active Task -->
+      <transition name="fade">
+        <div v-if="activeTask" class="card">
+          <h3>{{activeTask.title}}</h3>
+
+          <!-- MATCH -->
+          <div v-if="activeTask.type==='match'">
+            <div style="margin-bottom:12px">
+              <span v-for="w in shuffled" :key="w.en" class="item"
+                    :class="{'dragging-item': draggingItem === (w.en||w.text)}"
+                    draggable="true"
+                    @dragstart="dragStart(w)"
+                    @dragend="dragEnd"
+                    @touchstart.prevent="touchStart(w,$event)"
+                    @touchmove.prevent="touchMove($event)"
+                    @touchend.prevent="touchEnd($event)">{{w.en}}</span>
+            </div>
+
+            <div v-for="(z,index) in activeTask.data" :key="z.ru"
+                 class="dropzone"
+                 :data-drop-index="index"
+                 :class="{'drag-over': dragOver === z, 'filled': z.answer}"
+                 @dragenter.prevent="dragEnter(z)"
+                 @dragleave.prevent="dragLeave(z)"
+                 @dragover.prevent
+                 @drop="drop(index)">
+              <div style="flex:1">{{z.ru}}</div>
+              <div style="min-width:120px;text-align:right"><b>{{z.answer||'...'}}</b></div>
+            </div>
+          </div>
+
+          <!-- FILL -->
+          <div v-if="activeTask.type==='fill'">
+            <div v-for="q in activeTask.data" :key="q.text">
+              <p>{{q.text}}</p>
+              <input v-model="q.user" />
+            </div>
+          </div>
+
+          <!-- TABLE -->
+          <div v-if="activeTask.type==='table'">
+            <table style="width:100%">
+              <tr><th>Глагол</th><th>Правильная форма</th><th>Неправильная форма</th></tr>
+              <tr v-for="q in activeTask.data" :key="q.base">
+                <td>{{q.base}}</td>
+                <td><input v-model="q.reg"></td>
+                <td><input v-model="q.irreg"></td>
+              </tr>
+            </table>
+          </div>
+
+          <!-- TRIPLE: image + dropped text should be placed vertically under image -->
+          <div v-if="activeTask.type==='triple'">
+            <h4>Перетащите текст на соответствующую картинку</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:20px">
+              <div v-for="(z,index) in activeTask.data" :key="z.title"
+                   class="dropzone"
+                   :data-drop-index="index"
+                   :class="{'drag-over': dragOver === z, 'filled': z.answer, 'vertical': true}"
+                   style="flex:1;min-width:150px;text-align:center"
+                   @dragenter.prevent="dragEnter(z)"
+                   @dragleave.prevent="dragLeave(z)"
+                   @dragover.prevent
+                   @drop="drop(index)">
+                <img :src="imgBase + z.img" alt="" />
+                <b>{{z.answer || '...'}}</b>
+              </div>
+            </div>
+
+            <div style="margin-top:12px">
+              <span v-for="w in shuffled" :key="w.text" class="item"
+                    :class="{'dragging-item': draggingItem === (w.en||w.text)}"
+                    draggable="true"
+                    @dragstart="dragStart(w)"
+                    @dragend="dragEnd"
+                    @touchstart.prevent="touchStart(w,$event)"
+                    @touchmove.prevent="touchMove($event)"
+                    @touchend.prevent="touchEnd($event)">{{w.text}}</span>
+            </div>
+          </div>
+
+          <div style="
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 12px;
+            padding: 0 10px;
+            box-sizing: border-box;
+          ">
+            <button
+              style="margin-left:10px;background:rgba(255,255,255,.12);color:#303030""
+              @click="activeTask=null; result=null"
+            >
+              ← Вернуться к списку заданий
+            </button>
+            <button @click="submitTask">
+              Отправить
+            </button>
+          </div>
+
+        </div>
+      </transition>
+
+      <!-- Result -->
+      <transition name="fade">
+        <div v-if="result" class="card">
+          <h3>Результат</h3>
+          <p :class="['result',resultOk?'success':'fail']">{{result}}</p>
+          <p v-if="resultOk">+{{earned}} XP</p>
+          <button @click="closeResult">Продолжить</button>
+        </div>
+      </transition>
+    </div>
+
+    <!-- TEACHER (unchanged) -->
+    <div v-if="user && role==='teacher'" class="container">
+      <div class="topbar">
+        <h2>Панель преподавателя — {{user.login}}</h2>
+        <div style="display:flex;gap:10px;align-items:center">
+          <button style="background:#950a0a" @click="logout">Выйти</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Создать студента</h3>
+        <div style="display:flex;gap:8px;align-items:center">
+          <input v-model="newStudent" placeholder="Логин студента" />
+          <button @click="addStudent">Добавить</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <h3>Создать новый бейдж</h3>
+        <div class="teacher-create-badge">
+          <input v-model="newBadgeId" placeholder="id (латиница, без пробелов)" />
+          <input v-model="newBadgeTitle" placeholder="Название (показывается)" />
+          <input v-model="newBadgeIcon" placeholder="Иконка (emoji или URL)" />
+          <button @click="createBadge">Создать</button>
+        </div>
+        <p style="opacity:.8;margin-top:8px">После создания бейдж станет доступен в списке ачивок.</p>
+      </div>
+
+      <div v-if="teacherError" class="card" style="background:rgba(255,50,50,0.08);">
+        <strong>Ошибка:</strong> {{teacherError}}
+      </div>
+
+      <div v-if="students === null" class="card">Загружаю список студентов...</div>
+      <div v-else-if="students.length === 0" class="card">Нет студентов — добавьте первого, используя форму выше.</div>
+
+      <div v-else>
+        <div v-for="s in students" :key="s.login" class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <b>{{s.login}}</b> — XP {{s.xp}}
+              <div style="margin-top:8px">
+                <span v-for="b in s.badges" :key="b" class="badge">
+                  <span class="icon">{{badgeIconFromTitle(b)}}</span>
+                  <span>{{b}}</span>
+                </span>
+              </div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px">
+              <button @click="openBadgeModal(s.login)">Выдать ачивку</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Badge selection modal (teacher) -->
+    <div v-if="showBadgeModal" class="modal-backdrop" @click.self="closeBadgeModal">
+      <div class="modal">
+        <h4>Выдать ачивку студенту {{badgeTargetStudent}}</h4>
+
+        <div class="badge-row">
+          <div v-for="b in availableBadges" :key="b.id"
+               :class="['badge-option', {selected: selectedBadgeId === b.id}]"
+               @click="selectedBadgeId = b.id">
+            <span class="badge-icon">{{b.icon || b.title.slice(0,2)}}</span>
+            <div style="display:flex;flex-direction:column;align-items:flex-start">
+              <strong>{{b.title}}</strong>
+              <small style="opacity:.7">{{b.id}}</small>
+            </div>
+          </div>
+        </div>
+
+        <div class="controls">
+          <button @click="confirmGiveBadge">Выдать</button>
+          <button style="background:rgba(255,255,255,.12)" @click="closeBadgeModal">Отмена</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+const { createApp } = Vue;
+
+createApp({
+  data() {
+    return {
+      endpoints: {
+        tasks: 'http://localhost:3001/tasks',
+        tasksImgsBase: '',
+        studentsApi: 'http://localhost:3002',
+        teacherApi: 'http://localhost:3003',
+      },
+
+      login:'', role:'student', user:null,
+      students:null, newStudent:'',
+      xp:0, level:1, streak:0, combo:1, earned:0,
+      activeTask:null, shuffled:[], drag:null, result:null, resultOk:false,
+      tasks: [], imgBase: '', teacherError: '',
+
+      // drag state
+      dragOver: null,
+      draggingItem: null,
+
+      // badges
+      availableBadges: [],
+      showBadgeModal: false,
+      badgeTargetStudent: null,
+      selectedBadgeId: null,
+
+      // create badge inputs
+      newBadgeId: '', newBadgeTitle: '', newBadgeIcon: '',
+
+      // touch ghost element ref
+      touchGhost: null
+    };
+  },
+  computed: {
+    progress(){ return Math.min(100, Math.floor(this.xp/10)); },
+    completedSet() { return new Set((this.user && this.user.completedTasks) || []); }
+  },
+  methods: {
+    async fetchSafe(url, opts) {
+      try {
+        const res = await fetch(url, opts);
+        const text = await res.text();
+        let json = null;
+        try { json = JSON.parse(text); } catch(e) { json = null; }
+        return { ok: res.ok, status: res.status, json, text };
+      } catch (e) {
+        return { ok: false, status: 0, json: null, text: String(e) };
+      }
+    },
+
+    // AUTH
+    async auth(){
+      if(!this.login) return alert('Введите логин');
+      if(this.role === 'student'){
+        const url = this.endpoints.studentsApi + '/students';
+        const res = await this.fetchSafe(url, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ login: this.login })
+        });
+        if (!res.ok) { alert('Ошибка авторизации: ' + (res.json?.error || res.text)); return; }
+        const user = res.json || (() => { try { return JSON.parse(res.text); } catch { return null; } })();
+        if (!user) { alert('Неверный ответ от сервера: ' + res.text); return; }
+        this.user = user;
+        this.xp = user.xp || 0;
+        this.level = Math.floor(this.xp/50) + 1;
+        await this.loadTasks();
+        await this.loadAvailableBadges(); // icons for student's badges
+      } else {
+        // teacher
+        this.students = null;
+        const url = this.endpoints.teacherApi + '/teachers';
+        const res = await this.fetchSafe(url, {
+          method: 'POST',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ login: this.login })
+        });
+        if (!res.ok) { alert('Ошибка при входе как преподаватель: ' + (res.json?.error || res.text)); this.students = []; return; }
+        const teacher = res.json || (() => { try { return JSON.parse(res.text); } catch { return null; } })();
+        if (!teacher) { alert('Неверный ответ от teacher-service: ' + res.text); this.students = []; return; }
+        this.user = teacher;
+        await this.loadStudents();
+        await this.loadAvailableBadges();
+      }
+    },
+
+    logout(){
+      this.user = null;
+      this.login = '';
+      this.activeTask = null;
+      this.result = null;
+      this.teacherError = '';
+      this.students = null;
+      this.availableBadges = [];
+      this.showBadgeModal = false;
+    },
+
+    // TASKS
+    async loadTasks(){
+      const res = await this.fetchSafe(this.endpoints.tasks);
+      if (!res.ok) { alert('Не удалось загрузить задания: ' + (res.json?.error || res.text)); this.tasks = []; return; }
+      const data = res.json || (res.text ? JSON.parse(res.text || '{}') : {});
+      this.tasks = data.tasks || [];
+      // use frontend origin for images by default
+      // tasks.json should contain relative img paths like "images/pic1.jpg"
+      this.imgBase = window.location.origin + '/';
+    },
+
+    startTask(t){
+      this.activeTask = JSON.parse(JSON.stringify(t));
+      this.result = null; this.resultOk = false;
+      this.dragOver = null; this.draggingItem = null;
+      if(t.type === 'match') this.shuffled = [...t.data].sort(()=>Math.random() - .5);
+      if(t.type === 'triple') this.shuffled = [...t.data].map(d=>({text:d.text})).sort(()=>Math.random() - .5);
+    },
+
+    // DRAG HELPERS (desktop)
+    dragStart(w){
+      this.drag = w;
+      this.draggingItem = w.en || w.text || null;
+    },
+    dragEnd(){
+      this.drag = null;
+      this.draggingItem = null;
+      this.dragOver = null;
+    },
+    dragEnter(z){
+      this.dragOver = z;
+    },
+    dragLeave(z){
+      if(this.dragOver === z) this.dragOver = null;
+    },
+    drop(index){
+      if(this.drag) {
+        const target = this.activeTask.data[index];
+        target.answer = this.drag.en || this.drag.text || '';
+      }
+      this.drag = null; this.draggingItem = null; this.dragOver = null;
+    },
+    dropFinalize(){
+      this.drag = null; this.draggingItem = null; this.dragOver = null;
+    },
+
+    // TOUCH support for mobile (simulate drag)
+    touchStart(item, e){
+      const t = e.touches && e.touches[0];
+      this.drag = item;
+      this.draggingItem = item.en || item.text || null;
+      this.createTouchGhost(this.draggingItem, t ? t.clientX : null, t ? t.clientY : null);
+    },
+    touchMove(e){
+      const t = e.touches && e.touches[0];
+      if(!t) return;
+      this.moveTouchGhost(t.clientX, t.clientY);
+      const el = document.elementFromPoint(t.clientX, t.clientY);
+      const dz = el ? el.closest && el.closest('.dropzone') : null;
+      if(dz && dz.dataset && typeof dz.dataset.dropIndex !== 'undefined'){
+        const idx = Number(dz.dataset.dropIndex);
+        this.dragOver = this.activeTask && this.activeTask.data ? this.activeTask.data[idx] : null;
+      } else {
+        this.dragOver = null;
+      }
+    },
+    touchEnd(e){
+      const t = (e.changedTouches && e.changedTouches[0]) || null;
+      let dropped = false;
+      if(t){
+        const el = document.elementFromPoint(t.clientX, t.clientY);
+        const dz = el ? el.closest && el.closest('.dropzone') : null;
+        if(dz && dz.dataset && typeof dz.dataset.dropIndex !== 'undefined'){
+          const idx = Number(dz.dataset.dropIndex);
+          if(this.drag){
+            const target = this.activeTask.data[idx];
+            target.answer = this.drag.en || this.drag.text || '';
+            dropped = true;
+          }
+        }
+      }
+      this.removeTouchGhost();
+      this.drag = null;
+      this.draggingItem = null;
+      this.dragOver = null;
+      // keep filled highlight where answer was set (via target.answer)
+    },
+    createTouchGhost(text, x = null, y = null){
+      this.removeTouchGhost();
+      const g = document.createElement('div');
+      g.className = 'touch-ghost';
+      g.textContent = text || '';
+      document.body.appendChild(g);
+      this.touchGhost = g;
+      if(x !== null && y !== null){
+        g.style.left = x + 'px';
+        g.style.top = y + 'px';
+      }
+    },
+    moveTouchGhost(x, y){
+      if(!this.touchGhost) return;
+      this.touchGhost.style.left = (x + 14) + 'px';
+      this.touchGhost.style.top = (y + 14) + 'px';
+    },
+    removeTouchGhost(){
+      if(this.touchGhost && this.touchGhost.parentNode) {
+        this.touchGhost.parentNode.removeChild(this.touchGhost);
+      }
+      this.touchGhost = null;
+    },
+
+    async submitTask(){
+      let ok = true;
+      const t = this.activeTask;
+      if(!t) return;
+      if(t.type==='match'){ t.data.forEach(d => { if(d.answer!==d.en) ok=false }); }
+      if(t.type==='fill'){ t.data.forEach(d => { if((d.user||'').trim() !== (d.answer||'').trim()) ok=false }); }
+      if(t.type==='table'){ t.data.forEach(d => { if((d.reg||'').trim()==='' && (d.irreg||'').trim()==='') ok=false }); }
+      if(t.type==='triple'){ t.data.forEach(d => { if(d.answer !== d.text) ok=false }); }
+
+      this.resultOk = ok;
+      if(ok){
+        this.earned = 20 * this.combo;
+        this.xp += this.earned; this.combo++; this.streak++; this.result = 'Успешно!';
+        if(!this.user.completedTasks) this.user.completedTasks = [];
+        if(!this.user.completedTasks.includes(t.id)) this.user.completedTasks.push(t.id);
+        const url = `${this.endpoints.studentsApi}/students/${encodeURIComponent(this.user.login)}`;
+        const res = await this.fetchSafe(url, {
+          method: 'PUT',
+          headers: {'Content-Type':'application/json'},
+          body: JSON.stringify({ xp: this.xp, completedTasks: this.user.completedTasks, badges: this.user.badges || [] })
+        });
+        if (!res.ok) { console.warn('Failed to persist student progress:', res.status, res.text); alert('Не удалось сохранить прогресс на сервере: ' + (res.json?.error || res.text)); }
+      } else {
+        this.combo = 1; this.streak = 0; this.earned = 0; this.result = 'Попробуйте снова';
+      }
+      this.level = Math.floor(this.xp/50) + 1;
+      this.activeTask = null;
+    },
+
+    closeResult(){ this.result = null; },
+
+    // TEACHER: students & badges
+    async loadStudents(){
+      this.teacherError = '';
+      const res = await this.fetchSafe(this.endpoints.teacherApi + '/students');
+      if (!res.ok) { this.students = []; this.teacherError = (res.json?.error) ? res.json.error : res.text || 'Unknown error'; return; }
+      try { this.students = JSON.parse(JSON.stringify(res.json || [])); } catch(e) { this.students = []; this.teacherError = 'Invalid students data'; }
+    },
+
+    async addStudent(){
+      if(!this.newStudent) return;
+      const res = await this.fetchSafe(this.endpoints.studentsApi + '/students', {
+        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ login: this.newStudent })
+      });
+      if (!res.ok) { alert('Ошибка при создании студента: ' + (res.json?.error || res.text)); return; }
+      this.newStudent = ''; await this.loadStudents();
+    },
+
+    async loadAvailableBadges(){
+      const res = await this.fetchSafe(this.endpoints.teacherApi + '/badges');
+      if (!res.ok) { this.availableBadges = []; return; }
+      this.availableBadges = res.json || [];
+      if (!this.selectedBadgeId && this.availableBadges.length) this.selectedBadgeId = this.availableBadges[0].id;
+    },
+
+    openBadgeModal(login){
+      this.badgeTargetStudent = login;
+      this.selectedBadgeId = this.availableBadges.length ? this.availableBadges[0].id : null;
+      this.showBadgeModal = true;
+    },
+
+    closeBadgeModal(){
+      this.showBadgeModal = false; this.badgeTargetStudent = null; this.selectedBadgeId = null;
+    },
+
+    badgeIconFromTitle(title){
+      const b = this.availableBadges.find(x => x.title === title);
+      return b ? (b.icon || title.slice(0,2)) : title.slice(0,2);
+    },
+
+    async confirmGiveBadge(){
+      if(!this.badgeTargetStudent || !this.selectedBadgeId) return;
+      const badgeObj = this.availableBadges.find(b => b.id === this.selectedBadgeId);
+      const badgeTitle = badgeObj ? badgeObj.title : this.selectedBadgeId;
+      const res = await this.fetchSafe(`${this.endpoints.teacherApi}/students/${encodeURIComponent(this.badgeTargetStudent)}/badges`, {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'},
+        body: JSON.stringify({ badge: badgeTitle })
+      });
+      if (!res.ok) { alert('Не удалось выдать ачивку: ' + (res.json?.error || res.text)); return; }
+      await this.loadStudents();
+      this.closeBadgeModal();
+    },
+
+    async giveBadge(login){
+      this.openBadgeModal(login);
+    },
+
+    // CREATE BADGE
+    async createBadge(){
+      if(!this.newBadgeId || !this.newBadgeTitle) { alert('Введите id и название'); return; }
+      const payload = { id: this.newBadgeId, title: this.newBadgeTitle, icon: this.newBadgeIcon || '' };
+      const res = await this.fetchSafe(this.endpoints.teacherApi + '/badges', {
+        method: 'POST',
+        headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+      });
+      if (!res.ok) { alert('Не удалось создать бейдж: ' + (res.json?.error || res.text)); return; }
+      await this.loadAvailableBadges();
+      this.newBadgeId = ''; this.newBadgeTitle = ''; this.newBadgeIcon = '';
+      alert('Бейдж создан');
+    }
+  },
+  mounted(){
+    try { console.log('[frontend] app mounted, Vue.compile =', typeof Vue.compile); } catch(e){}
+    try { window.__APP = this; } catch(e){}
+  }
+}).mount('#app');
+</script>
+</body>
+</html>

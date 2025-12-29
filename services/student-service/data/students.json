@@ -1,0 +1,33 @@
+[
+  {
+    "login": "Ivan",
+    "xp": 20,
+    "badges": [
+      "Отлично",
+      "Молодец",
+      "Быстро учится"
+    ],
+    "completedTasks": [
+      1
+    ]
+  },
+  {
+    "login": "Test",
+    "xp": 20,
+    "badges": [
+      "Достижение",
+      "test"
+    ],
+    "completedTasks": [
+      6
+    ]
+  },
+  {
+    "login": "Alice",
+    "xp": 0,
+    "badges": [
+      "Отлично"
+    ],
+    "completedTasks": []
+  }
+]

@@ -1,0 +1,88 @@
+{
+  "tasks": [
+    {
+      "id": 1,
+      "title": "Сопоставление слов",
+      "desc": "Соедините слово с переводом",
+      "type": "match",
+      "data": [
+        { "en": "ancient civilization", "ru": "древняя цивилизация" },
+        { "en": "to promote goods and services", "ru": "продвигать товары и услуги" },
+        { "en": "to attract attention", "ru": "привлекать внимание" },
+        { "en": "hieroglyphic inscription", "ru": "иероглифическая надпись" },
+        { "en": "to showcase", "ru": "демонстрировать" },
+        { "en": "to convey a message", "ru": "передавать сообщение" },
+        { "en": "first recorded advertisement", "ru": "первая зафиксированная реклама" },
+        { "en": "street vendors", "ru": "уличные торговцы" },
+        { "en": "to date back", "ru": "датироваться, уходить корнями" }
+      ]
+    },
+    {
+      "id": 3,
+      "title": "Синонимы",
+      "desc": "Соедините синонимы",
+      "type": "match",
+      "data": [
+        { "en": "to promote", "ru": "to advertise" },
+        { "en": "to seize an opportunity", "ru": "to grab the chance" },
+        { "en": "to attract attention", "ru": "to catch the eye" },
+        { "en": "to use", "ru": "to apply" },
+        { "en": "to originate", "ru": "to date back" },
+        { "en": "to showcase", "ru": "to demonstrate" },
+        { "en": "to convey a message", "ru": "to deliver information" }
+      ]
+    },
+    {
+      "id": 4,
+      "title": "Образование существительных",
+      "desc": "Образуйте существительное от глагола",
+      "type": "fill",
+      "data": [
+        { "text": "to promote →", "answer": "promotion" },
+        { "text": "to communicate →", "answer": "communication" },
+        { "text": "to develop →", "answer": "development" },
+        { "text": "to announce →", "answer": "announcement" },
+        { "text": "to organize →", "answer": "organization" }
+      ]
+    },
+    {
+      "id": 5,
+      "title": "Прошедшее время",
+      "desc": "Заполните таблицу",
+      "type": "table",
+      "data": [
+        { "base": "to allow", "reg": "", "irreg": "" },
+        { "base": "to be", "reg": "", "irreg": "" },
+        { "base": "to become", "reg": "", "irreg": "" },
+        { "base": "to bring", "reg": "", "irreg": "" },
+        { "base": "to take", "reg": "", "irreg": "" }
+      ]
+    },
+    {
+      "id": 6,
+      "title": "История рекламы",
+      "desc": "Сопоставьте текст и картинку",
+      "type": "triple",
+      "data": [
+        { "title": "Birth of Print Advertising", "text": "Birth of Print Advertising", "img": "/public/images/pic1.jpg" },
+        { "title": "Listen Watch Buy", "text": "Listen Watch Buy", "img": "/public/images/pic2.jpg" },
+        { "title": "Click your target audience", "text": "Click your target audience", "img": "/public/images/pic3.jpg" },
+        { "title": "Cleaner faster safer", "text": "Cleaner faster safer", "img": "/public/images/pic4.jpg" },
+        { "title": "Miracle that changed advertising", "text": "Miracle that changed advertising", "img": "/public/images/pic5.jpg" }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Прилагательные",
+      "desc": "Заполните прилагательные",
+      "type": "match",
+      "data": [
+        { "en": "influential", "ru": "One of the most ___ agencies was N.W. Ayer & Son." },
+        { "en": "pivotal", "ru": "This agency played a ___ role." },
+        { "en": "effective", "ru": "Creating ___ ad campaigns." },
+        { "en": "innovative", "ru": "They were ___ in their approach." },
+        { "en": "compelling", "ru": "The campaigns were ___ and memorable." }
+      ]
+    }
+  ]
+}
