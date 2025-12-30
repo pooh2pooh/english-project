@@ -18,7 +18,7 @@
       ]
     },
     {
-      "id": 3,
+      "id": 2,
       "title": "Синонимы",
       "desc": "Соедините синонимы",
       "type": "match",
@@ -33,7 +33,7 @@
       ]
     },
     {
-      "id": 4,
+      "id": 3,
       "title": "Образование существительных",
       "desc": "Образуйте существительное от глагола",
       "type": "fill",
@@ -46,7 +46,7 @@
       ]
     },
     {
-      "id": 5,
+      "id": 4,
       "title": "Прошедшее время",
       "desc": "Заполните таблицу",
       "type": "table",
@@ -59,7 +59,7 @@
       ]
     },
     {
-      "id": 6,
+      "id": 5,
       "title": "История рекламы",
       "desc": "Сопоставьте текст и картинку",
       "type": "triple",
@@ -72,7 +72,7 @@
       ]
     },
     {
-      "id": 7,
+      "id": 6,
       "title": "Прилагательные",
       "desc": "Заполните прилагательные",
       "type": "match",
@@ -82,6 +82,98 @@
         { "en": "effective", "ru": "Creating ___ ad campaigns." },
         { "en": "innovative", "ru": "They were ___ in their approach." },
         { "en": "compelling", "ru": "The campaigns were ___ and memorable." }
+      ]
+    },
+    {
+      "id": 7,
+      "title": "Термины",
+      "desc": "Подберите термины к данным определениям",
+      "type": "match",
+      "data": [
+        { "en": "Advertising", "ru": "an industry aimed to attract/to call the attention of customers to a product or service." },
+        { "en": "Advertisement", "ru": "public communication that promotes a product, service, brand or event" },
+        { "en": "Target audience", "ru": "a specific group of people who are interested in a business’s products and services." }
+      ]
+    },
+    {
+      "id": 8,
+      "title": "Сопоставление слов №2",
+      "desc": "Соедините слово с переводом",
+      "type": "match",
+      "data": [
+        { "en": "advertising", "ru": "рекламная деятельность" },
+        { "en": "an advertisement", "ru": "рекламное объявление" },
+        { "en": "target audience", "ru": "целевая аудитория" },
+        { "en": "an area of advertising", "ru": "область рекламы" },
+        { "en": "to reach the target audience", "ru": "охватывать целевую аудиторию" },
+        { "en": "broad appeal", "ru": "широкая привлекательность" },
+        { "en": "demographic peculiarities", "ru": "демографические особенности" },
+        { "en": "consumer choices", "ru": "выбор потребителей" },
+        { "en": "brand loyalty", "ru": "лояльность к бренду" },
+        { "en": "past purchases", "ru": "предыдущие покупки" },
+        { "en": "to boost sales", "ru": "увеличить продажи" },
+        { "en": "to gain market share", "ru": "завоевать рынок" },
+        { "en": "to launch a new product line", "ru": "запустить новую линейку продуктов" },
+        { "en": "to raise customers’ awareness of the product or service", "ru": "повысить осведомленность клиентов о продукте или услуге" },
+        { "en": "to emphasize unique qualities of a product or service", "ru": "подчеркивать уникальные качества товара или услуги" }
+      ]
+    },
+    {
+      "id": 9,
+      "title": "Заполнить таблицу",
+      "desc": "Необходимо образовать прилагательное от данных существительных",
+      "type": "fill",
+      "data": [
+        { "text": "communication →", "answer": "..." },
+        { "text": "promotion →", "answer": "..." },
+        { "text": "loyalty →", "answer": "..." },
+        { "text": "appeal →", "answer": "..." },
+        { "text": "region →", "answer": "..." },
+        { "text": "nation →", "answer": "..." },
+        { "text": "interest →", "answer": "..." },
+        { "text": "digit →", "answer": "..." },
+        { "text": "competition →", "answer": "..." },
+        { "text": "attraction →", "answer": "..." }
+      ]
+    },
+    {
+      "id": 10,
+      "title": "Заполнить пропуски",
+      "desc": "Заполнить пропуски словами и словосочетаниями",
+      "type": "match",
+      "data": [
+        { "en": "campaigns", "ru": "The advertising ………. of this world-famous brand are iconic." },
+        { "en": "audience", "ru": "They capture the attention of their target……….  creating captivating and memorable ads." },
+        { "en": "customers", "ru": "Competently- developed advertising campaigns always attract the attention of their potential ……… worldwide." },
+        { "en": "customers’ awareness", "ru": "Creating an advertisement they try to raise……… of the product or service." },
+        { "en": "unique qualities", "ru": "Using the most efficient promotional tools they emphasize………. of a product or service" },
+        { "en": "advertising", "ru": "They do believe that effective……….. can solve a consumer’s need or improve the consumer's life in some way." },
+        { "en": "an online forum awareness", "ru": "Launching a new advertising campaign they always start……… to get feedback from their  customers." }
+      ]
+    },
+    {
+      "id": 11,
+      "title": "Заполнить таблицу №2",
+      "desc": "Необходимо написать название кампании на основе еe рекламного слогана",
+      "type": "fill",
+      "data": [
+        { "text": "Just Do It →", "answer": "Nike" },
+        { "text": "Think small →", "answer": "..." },
+        { "text": "Connecting People →", "answer": "Nokia" },
+        { "text": "The best a man can get →", "answer": "..." },
+        { "text": "It’s everywhere you want to be →", "answer": "..." },
+        { "text": "Let your fingers do the walking →", "answer": "..." },
+        { "text": "Same time tomorrow? →", "answer": "..." },
+        { "text": "Don’t dream it. Drive it!! →", "answer": "..." },
+        { "text": "Have it your way! →", "answer": "..." },
+        { "text": "Because I’m worth it! →", "answer": "..." },
+        { "text": "Betcha can’t just eat one →", "answer": "..." },
+        { "text": "They’re grrreat! →", "answer": "..." },
+        { "text": "Have a break, have a ………! →", "answer": "..." },
+        { "text": "The happiest place on earth →", "answer": "..." },
+        { "text": "Obey your thirst →", "answer": "..." },
+        { "text": "Express Yourself Everyday →", "answer": "..." },
+        { "text": "Two for me and none for you →", "answer": "..." }
       ]
     }
   ]

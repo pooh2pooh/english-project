@@ -6,73 +6,552 @@
   <meta name="viewport" content="width=device-width,initial-scale=1.0" />
   <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
   <style>
-    :root{
-      --bg1:#ffffff;--bg2:#bed7e0;--bg3:#d3e4ec;
-      --card:rgba(255,255,255,.08);
-      --accent:#00c6ff;--accent2:#0072ff;--success:#009f60;--danger:#ff6b6b;
+    /* ============================================
+       CSS ПЕРЕМЕННЫЕ И БАЗОВЫЕ СТИЛИ
+       ============================================ */
+    :root {
+      --bg1: #ffffff;
+      --bg2: #bed7e0;
+      --bg3: #d3e4ec;
+      --card: rgba(255, 255, 255, 0.08);
+      --accent: #00c6ff;
+      --accent2: #0072ff;
+      --success: #009f60;
+      --danger: #ff6b6b;
+      
+      /* Единые размеры и отступы */
+      --spacing-xs: 8px;
+      --spacing-sm: 12px;
+      --spacing-md: 16px;
+      --spacing-lg: 24px;
+      --spacing-xl: 32px;
+      
+      --button-height: 44px;
+      --button-padding-x: 20px;
+      --border-radius: 12px;
+      --border-radius-lg: 22px;
+      
+      --transition-fast: 0.15s ease;
+      --transition-normal: 0.25s ease;
+      --transition-slow: 0.4s ease;
     }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:'Inter',sans-serif;background:linear-gradient(135deg,var(--bg1),var(--bg2),var(--bg3));color:#303030;min-height:100vh}
-    .container{max-width:1100px;margin:auto;padding:20px}
-    .card{background:var(--card);backdrop-filter:blur(14px);border-radius:22px;padding:24px;margin-bottom:24px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
-    h1,h2,h3{margin-top:0}
-    button{border:none;border-radius:14px;padding:10px 16px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--accent),var(--accent2));color:#fff;transition:.12s}
-    button:hover{transform:translateY(-2px)}
-    input,select,textarea{width:100%;padding:10px;border-radius:12px;border:none;margin:6px 0 12px;font-family:inherit}
-    .progress{margin-top:16px;margin-bottom:16px;height:10px;background:rgba(255,255,255,.2);border-radius:10px;overflow:hidden}
-    .progress div{height:100%;background:linear-gradient(135deg,var(--success),#00cc66)}
-    .topbar{display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
-    .stats{display:flex;gap:14px;flex-wrap:wrap;font-weight:600}
-    .badge{background:white;color:#000;border-radius:12px;padding:4px 10px;font-size:12px;font-weight:800;margin:4px;display:inline-flex;align-items:center;gap:8px}
-    .badge .icon{font-size:16px}
-    .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
-    .item{background:#fff;color:#000;padding:8px 12px;border-radius:8px;margin:4px;cursor:grab;display:inline-block;transition:.12s;touch-action:none}
-    .item.dragging-item{opacity:0.6;transform:scale(.98);box-shadow:0 6px 20px rgba(0,0,0,.35)}
-    .dropzone{min-height:42px;border:2px dashed rgba(255,255,255,.4);border-radius:12px;padding:10px;margin-bottom:10px;transition:.12s;display:flex;align-items:center;justify-content:space-between;overflow:hidden}
-    .dropzone.drag-over{border-color:var(--accent);background:rgba(0,198,255,0.06);transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,.28)}
-    .dropzone.filled{border-color:rgba(0,255,153,0.9);background:rgba(0,255,153,0.04);box-shadow:0 8px 24px rgba(0,0,0,.18)}
-    /* vertical layout for dropzone (used under images) */
-    .dropzone.vertical{flex-direction:column;align-items:center;gap:8px;padding:12px}
-    .dropzone.vertical img{max-width:100%;height:auto;max-height:200px;border-radius:10px;object-fit:cover}
-    .dropzone.vertical b{display:block;margin-top:6px;word-break:break-word;text-align:center;max-width:100%}
-    .dropzone b{white-space:normal}
-    .result.success{color:var(--success);font-weight:800}
-    .result.fail{color:var(--danger);font-weight:800}
 
-    /* Modal */
-    .modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:flex;align-items:center;justify-content:center;z-index:10000}
-    .modal{background:#0b1220;padding:18px;border-radius:12px;min-width:320px;color:#fff}
-    .modal h4{margin:0 0 12px}
-    .modal .controls{display:flex;gap:10px;justify-content:flex-end;margin-top:12px}
-    .modal .badge-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-    .modal .badge-option{padding:8px;border-radius:8px;background:rgba(255,255,255,0.04);cursor:pointer;display:flex;gap:8px;align-items:center}
-    .modal .badge-option.selected{outline:2px solid var(--accent);transform:translateY(-2px)}
-    .modal .badge-icon{font-size:18px}
-    .teacher-create-badge{display:flex;gap:8px;flex-wrap:wrap}
-    .teacher-create-badge input{flex:1;min-width:140px}
-    @media(max-width:600px){.container{padding:12px}}
+    * {
+      box-sizing: border-box;
+    }
 
-    /* touch ghost */
+    body {
+      margin: 0;
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2), var(--bg3));
+      color: #303030;
+      min-height: 100vh;
+    }
+
+    /* ============================================
+       КОНТЕЙНЕРЫ И КАРТОЧКИ
+       ============================================ */
+    .container {
+      max-width: 1100px;
+      margin: auto;
+      padding: var(--spacing-md);
+    }
+
+    .card {
+      background: var(--card);
+      backdrop-filter: blur(14px);
+      border-radius: var(--border-radius-lg);
+      padding: var(--spacing-lg);
+      margin-bottom: var(--spacing-lg);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      transition: transform var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    .card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4);
+    }
+
+    /* ============================================
+       ТИПОГРАФИКА
+       ============================================ */
+    h1, h2, h3, h4 {
+      margin-top: 0;
+      margin-bottom: var(--spacing-md);
+    }
+
+    /* ============================================
+       КНОПКИ (единый размер)
+       ============================================ */
+    button {
+      border: none;
+      border-radius: var(--border-radius);
+      padding: 0 var(--button-padding-x);
+      height: var(--button-height);
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      color: #fff;
+      transition: all var(--transition-fast);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+    }
+
+    button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 198, 255, 0.4);
+    }
+
+    button:active {
+      transform: translateY(0);
+    }
+
+    /* ============================================
+       ФОРМЫ
+       ============================================ */
+    input, select, textarea {
+      width: 100%;
+      padding: var(--spacing-sm);
+      border-radius: var(--border-radius);
+      border: none;
+      margin: var(--spacing-xs) 0 var(--spacing-md);
+      font-family: inherit;
+      font-size: 14px;
+      transition: box-shadow var(--transition-fast);
+    }
+
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      box-shadow: 0 0 0 3px rgba(0, 198, 255, 0.2);
+    }
+
+    /* ============================================
+       ПРОГРЕСС БАР
+       ============================================ */
+    .progress {
+      margin: var(--spacing-md) 0;
+      height: 10px;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      overflow: hidden;
+    }
+
+    .progress div {
+      height: 100%;
+      background: linear-gradient(135deg, var(--success), #00cc66);
+      transition: width var(--transition-normal);
+    }
+
+    /* ============================================
+       ШАПКА И СТАТИСТИКА
+       ============================================ */
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    .stats {
+      display: flex;
+      gap: var(--spacing-md);
+      flex-wrap: wrap;
+      font-weight: 600;
+      margin-bottom: var(--spacing-lg);
+    }
+
+    /* ============================================
+       БЕЙДЖИ
+       ============================================ */
+    .badge {
+      background: white;
+      color: #000;
+      border-radius: var(--border-radius);
+      padding: 4px var(--spacing-sm);
+      font-size: 12px;
+      font-weight: 800;
+      margin: var(--spacing-xs);
+      display: inline-flex;
+      align-items: center;
+      gap: var(--spacing-xs);
+      transition: transform var(--transition-fast);
+    }
+
+    .badge:hover {
+      transform: scale(1.05);
+    }
+
+    .badge .icon {
+      font-size: 16px;
+    }
+
+    /* ============================================
+       СЕТКА ЗАДАНИЙ
+       ============================================ */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--spacing-lg);
+    }
+
+    /* ============================================
+       DRAG AND DROP ЭЛЕМЕНТЫ
+       ============================================ */
+    .item {
+      background: #fff;
+      color: #000;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--border-radius);
+      margin: var(--spacing-xs);
+      cursor: grab;
+      display: inline-block;
+      transition: all var(--transition-fast);
+      touch-action: none;
+      user-select: none;
+      font-weight: 600;
+    }
+
+    .item:active {
+      cursor: grabbing;
+    }
+
+    .item.dragging-item {
+      opacity: 0.6;
+      transform: scale(0.98);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+    }
+
+    /* ============================================
+       ЗОНЫ ПЕРЕТАСКИВАНИЯ
+       ============================================ */
+    .dropzone {
+      min-height: 42px;
+      border: 2px dashed rgba(255, 255, 255, 0.4);
+      border-radius: var(--border-radius);
+      padding: var(--spacing-sm);
+      margin-bottom: var(--spacing-sm);
+      transition: all var(--transition-normal);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      overflow: hidden;
+    }
+
+    .dropzone.drag-over {
+      border-color: var(--accent);
+      background: rgba(0, 198, 255, 0.06);
+      transform: translateY(-3px);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.28);
+    }
+
+    .dropzone.filled {
+      border-color: rgba(0, 255, 153, 0.9);
+      background: rgba(0, 255, 153, 0.04);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18);
+    }
+
+    /* Вертикальная раскладка для dropzone под картинками */
+    .dropzone.vertical {
+      flex-direction: column;
+      align-items: center;
+      gap: var(--spacing-xs);
+      padding: var(--spacing-sm);
+    }
+
+    .dropzone.vertical img {
+      max-width: 100%;
+      height: auto;
+      max-height: 200px;
+      border-radius: 10px;
+      object-fit: cover;
+      transition: transform var(--transition-fast);
+    }
+
+    .dropzone.vertical img:hover {
+      transform: scale(1.02);
+    }
+
+    .dropzone.vertical b {
+      display: block;
+      margin-top: var(--spacing-xs);
+      word-break: break-word;
+      text-align: center;
+      max-width: 100%;
+    }
+
+    .dropzone b {
+      white-space: normal;
+    }
+
+    /* ============================================
+       РЕЗУЛЬТАТЫ
+       ============================================ */
+    .result.success {
+      color: var(--success);
+      font-weight: 800;
+    }
+
+    .result.fail {
+      color: var(--danger);
+      font-weight: 800;
+    }
+
+    /* ============================================
+       МОДАЛЬНОЕ ОКНО
+       ============================================ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      animation: fadeIn var(--transition-normal);
+      backdrop-filter: blur(4px);
+    }
+
+    .modal {
+      background: #0b1220;
+      padding: var(--spacing-lg);
+      border-radius: var(--border-radius);
+      min-width: 320px;
+      max-width: 90vw;
+      color: #fff;
+      animation: slideUp var(--transition-normal);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal h4 {
+      margin: 0 0 var(--spacing-md);
+    }
+
+    .modal .controls {
+      display: flex;
+      gap: var(--spacing-sm);
+      justify-content: flex-end;
+      margin-top: var(--spacing-md);
+    }
+
+    .modal .badge-row {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+      margin-top: var(--spacing-sm);
+    }
+
+    .modal .badge-option {
+      padding: var(--spacing-xs);
+      border-radius: var(--border-radius);
+      background: rgba(255, 255, 255, 0.04);
+      cursor: pointer;
+      display: flex;
+      gap: var(--spacing-xs);
+      align-items: center;
+      transition: all var(--transition-fast);
+    }
+
+    .modal .badge-option:hover {
+      background: rgba(255, 255, 255, 0.08);
+      transform: translateY(-2px);
+    }
+
+    .modal .badge-option.selected {
+      outline: 2px solid var(--accent);
+      background: rgba(0, 198, 255, 0.1);
+    }
+
+    .modal .badge-icon {
+      font-size: 18px;
+    }
+
+    /* ============================================
+       ФОРМЫ ПРЕПОДАВАТЕЛЯ
+       ============================================ */
+    .teacher-create-badge {
+      display: flex;
+      gap: var(--spacing-xs);
+      flex-wrap: wrap;
+    }
+
+    .teacher-create-badge input {
+      flex: 1;
+      min-width: 140px;
+    }
+
+    /* ============================================
+       ТАБЛИЦЫ
+       ============================================ */
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th, table td {
+      padding: var(--spacing-sm);
+      text-align: left;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    table th {
+      font-weight: 700;
+    }
+
+    /* ============================================
+       ВИЗУАЛЬНЫЙ ПРИЗРАК ДЛЯ TOUCH
+       ============================================ */
     .touch-ghost {
       position: fixed;
       pointer-events: none;
       background: #fff;
       color: #000;
-      padding: 8px 10px;
-      border-radius: 8px;
+      padding: var(--spacing-xs) var(--spacing-sm);
+      border-radius: var(--border-radius);
       transform: translate(-50%, -50%);
-      box-shadow: 0 8px 24px rgba(0,0,0,0.35);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
       z-index: 20000;
-      font-weight:700;
+      font-weight: 700;
       white-space: nowrap;
       opacity: 0.95;
       font-size: 14px;
+      transition: opacity var(--transition-fast);
+    }
+
+    /* ============================================
+       АНИМАЦИИ
+       ============================================ */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .fade-enter-active, .fade-leave-active {
+      transition: opacity var(--transition-normal);
+    }
+
+    .fade-enter-from, .fade-leave-to {
+      opacity: 0;
+    }
+
+    /* ============================================
+       MOBILE-FIRST АДАПТИВНОСТЬ
+       ============================================ */
+    @media (max-width: 600px) {
+      .container {
+        padding: var(--spacing-sm);
+      }
+
+      .card {
+        padding: var(--spacing-md);
+        margin-bottom: var(--spacing-md);
+      }
+
+      .topbar {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .stats {
+        font-size: 14px;
+      }
+
+      .grid {
+        grid-template-columns: 1fr;
+        gap: var(--spacing-md);
+      }
+
+      button {
+        width: 100%;
+        margin-bottom: var(--spacing-xs);
+      }
+
+      .modal {
+        min-width: auto;
+        width: 95vw;
+        padding: var(--spacing-md);
+      }
+    }
+
+    /* ============================================
+       УТИЛИТЫ
+       ============================================ */
+    .flex {
+      display: flex;
+    }
+
+    .flex-between {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--spacing-md);
+    }
+
+    .flex-column {
+      display: flex;
+      flex-direction: column;
+      gap: var(--spacing-sm);
+    }
+
+    /* ============================================
+       КНОПКИ УПРАВЛЕНИЯ ЗАДАНИЕМ
+       ============================================ */
+    .task-controls {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: var(--spacing-sm);
+      flex-wrap: wrap;
+    }
+
+    .task-controls .btn-back,
+    .task-controls .btn-submit {
+      flex: 1 1 auto;
+      min-width: 140px;
+      white-space: nowrap;
+    }
+
+    /* На маленьких экранах кнопки друг под другом */
+    @media (max-width: 600px) {
+      .task-controls {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .task-controls .btn-back,
+      .task-controls .btn-submit {
+        width: 100%;
+        flex: 1 1 100%;
+        min-width: 0;
+        padding: 4% 0;
+      }
     }
   </style>
 </head>
 <body>
   <div id="app">
-    <!-- LOGIN -->
+    <!-- ============================================
+         ЭКРАН ВХОДА
+         ============================================ -->
     <transition name="fade">
       <div v-if="!user" class="container">
         <div class="card" style="max-width:420px;margin:12vh auto">
@@ -87,13 +566,17 @@
       </div>
     </transition>
 
-    <!-- STUDENT -->
+    <!-- ============================================
+         ПАНЕЛЬ СТУДЕНТА
+         ============================================ -->
     <div v-if="user && role==='student'" class="container">
+      <!-- Шапка с кнопкой выхода -->
       <div class="topbar">
         <h2>Панель студента — {{user.login}}</h2>
         <button style="background:#950a0a" @click="logout">Выйти</button>
       </div>
 
+      <!-- Статистика -->
       <div class="stats">
         <span>⭐ XP {{xp}}</span>
         <span>🏆 Уровень {{level}}</span>
@@ -101,9 +584,12 @@
         <span>🧬 Комбо x{{combo}}</span>
       </div>
 
-      <div class="progress"><div :style="{width:progress+'%'}"></div></div>
+      <!-- Прогресс бар -->
+      <div class="progress">
+        <div :style="{width:progress+'%'}"></div>
+      </div>
 
-      <!-- Student badges: show icon (from availableBadges mapping) -->
+      <!-- Ачивки студента -->
       <div class="card" v-if="user.badges && user.badges.length">
         <h3>Ачивки</h3>
         <div>
@@ -114,6 +600,7 @@
         </div>
       </div>
 
+      <!-- Список заданий -->
       <transition name="fade">
         <div v-if="!activeTask && !result">
           <h3>Задания курса</h3>
@@ -122,20 +609,23 @@
               <h4>{{t.title}}</h4>
               <p>{{t.desc}}</p>
               <button @click="startTask(t)">Начать</button>
-              <span v-if="completedSet.has(t.id)" style="margin-left:10px;color:var(--success);font-weight:700">✔ пройдено</span>
+              <span v-if="completedSet.has(t.id)" style="margin-left:var(--spacing-sm);color:var(--success);font-weight:700">✔ пройдено</span>
             </div>
           </div>
         </div>
       </transition>
 
-      <!-- Active Task -->
+      <!-- ============================================
+           АКТИВНОЕ ЗАДАНИЕ
+           ============================================ -->
       <transition name="fade">
         <div v-if="activeTask" class="card">
           <h3>{{activeTask.title}}</h3>
 
-          <!-- MATCH -->
+          <!-- Тип задания: MATCH (соответствие) -->
           <div v-if="activeTask.type==='match'">
-            <div style="margin-bottom:12px">
+            <!-- Список слов для перетаскивания -->
+            <div style="margin-bottom:var(--spacing-md)">
               <span v-for="w in shuffled" :key="w.en" class="item"
                     :class="{'dragging-item': draggingItem === (w.en||w.text)}"
                     draggable="true"
@@ -146,30 +636,34 @@
                     @touchend.prevent="touchEnd($event)">{{w.en}}</span>
             </div>
 
+            <!-- Зоны для перетаскивания -->
             <div v-for="(z,index) in activeTask.data" :key="z.ru"
                  class="dropzone"
                  :data-drop-index="index"
                  :class="{'drag-over': dragOver === z, 'filled': z.answer}"
                  @dragenter.prevent="dragEnter(z)"
                  @dragleave.prevent="dragLeave(z)"
-                 @dragover.prevent
+                 @dragover.prevent="dragOverHandler"
                  @drop="drop(index)">
               <div style="flex:1">{{z.ru}}</div>
               <div style="min-width:120px;text-align:right"><b>{{z.answer||'...'}}</b></div>
             </div>
           </div>
 
-          <!-- FILL -->
+          <!-- Тип задания: FILL (заполнение) -->
           <div v-if="activeTask.type==='fill'">
-            <div v-for="q in activeTask.data" :key="q.text">
-              <p>{{q.text}}</p>
-              <input v-model="q.user" />
-            </div>
+            <table>
+              <tr><th></th><th></th></tr>
+              <tr v-for="q in activeTask.data" :key="q.text">
+                <td>{{q.text}}</td>
+                <td><input v-model="q.user" /></td>
+              </tr>
+            </table>
           </div>
 
-          <!-- TABLE -->
+          <!-- Тип задания: TABLE (таблица) -->
           <div v-if="activeTask.type==='table'">
-            <table style="width:100%">
+            <table>
               <tr><th>Глагол</th><th>Правильная форма</th><th>Неправильная форма</th></tr>
               <tr v-for="q in activeTask.data" :key="q.base">
                 <td>{{q.base}}</td>
@@ -179,10 +673,11 @@
             </table>
           </div>
 
-          <!-- TRIPLE: image + dropped text should be placed vertically under image -->
+          <!-- Тип задания: TRIPLE (картинка + текст) -->
           <div v-if="activeTask.type==='triple'">
             <h4>Перетащите текст на соответствующую картинку</h4>
-            <div style="display:flex;flex-wrap:wrap;gap:20px">
+            <!-- Картинки с зонами перетаскивания -->
+            <div style="display:flex;flex-wrap:wrap;gap:var(--spacing-lg)">
               <div v-for="(z,index) in activeTask.data" :key="z.title"
                    class="dropzone"
                    :data-drop-index="index"
@@ -190,14 +685,15 @@
                    style="flex:1;min-width:150px;text-align:center"
                    @dragenter.prevent="dragEnter(z)"
                    @dragleave.prevent="dragLeave(z)"
-                   @dragover.prevent
+                   @dragover.prevent="dragOverHandler"
                    @drop="drop(index)">
                 <img :src="imgBase + z.img" alt="" />
                 <b>{{z.answer || '...'}}</b>
               </div>
             </div>
 
-            <div style="margin-top:12px">
+            <!-- Список текстов для перетаскивания -->
+            <div style="margin-top:var(--spacing-md)">
               <span v-for="w in shuffled" :key="w.text" class="item"
                     :class="{'dragging-item': draggingItem === (w.en||w.text)}"
                     draggable="true"
@@ -209,29 +705,25 @@
             </div>
           </div>
 
-          <div style="
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-top: 12px;
-            padding: 0 10px;
-            box-sizing: border-box;
-          ">
+          <!-- Кнопки управления заданием -->
+          <div class="task-controls" style="margin-top:var(--spacing-md);padding:0 var(--spacing-sm)">
             <button
-              style="margin-left:10px;background:rgba(255,255,255,.12);color:#303030""
+              class="btn-back"
+              style="background:rgba(255,255,255,.12);color:#303030"
               @click="activeTask=null; result=null"
             >
               ← Вернуться к списку заданий
             </button>
-            <button @click="submitTask">
+            <button class="btn-submit" @click="submitTask">
               Отправить
             </button>
           </div>
-
         </div>
       </transition>
 
-      <!-- Result -->
+      <!-- ============================================
+           РЕЗУЛЬТАТ ВЫПОЛНЕНИЯ ЗАДАНИЯ
+           ============================================ -->
       <transition name="fade">
         <div v-if="result" class="card">
           <h3>Результат</h3>
@@ -242,23 +734,28 @@
       </transition>
     </div>
 
-    <!-- TEACHER (unchanged) -->
+    <!-- ============================================
+         ПАНЕЛЬ ПРЕПОДАВАТЕЛЯ
+         ============================================ -->
     <div v-if="user && role==='teacher'" class="container">
+      <!-- Шапка -->
       <div class="topbar">
         <h2>Панель преподавателя — {{user.login}}</h2>
-        <div style="display:flex;gap:10px;align-items:center">
+        <div class="flex" style="gap:var(--spacing-sm);align-items:center">
           <button style="background:#950a0a" @click="logout">Выйти</button>
         </div>
       </div>
 
+      <!-- Форма создания студента -->
       <div class="card">
         <h3>Создать студента</h3>
-        <div style="display:flex;gap:8px;align-items:center">
+        <div class="flex" style="gap:var(--spacing-xs);align-items:center">
           <input v-model="newStudent" placeholder="Логин студента" />
           <button @click="addStudent">Добавить</button>
         </div>
       </div>
 
+      <!-- Форма создания бейджа -->
       <div class="card">
         <h3>Создать новый бейдж</h3>
         <div class="teacher-create-badge">
@@ -267,29 +764,31 @@
           <input v-model="newBadgeIcon" placeholder="Иконка (emoji или URL)" />
           <button @click="createBadge">Создать</button>
         </div>
-        <p style="opacity:.8;margin-top:8px">После создания бейдж станет доступен в списке ачивок.</p>
+        <p style="opacity:.8;margin-top:var(--spacing-xs)">После создания бейдж станет доступен в списке ачивок.</p>
       </div>
 
+      <!-- Сообщение об ошибке -->
       <div v-if="teacherError" class="card" style="background:rgba(255,50,50,0.08);">
         <strong>Ошибка:</strong> {{teacherError}}
       </div>
 
+      <!-- Список студентов -->
       <div v-if="students === null" class="card">Загружаю список студентов...</div>
       <div v-else-if="students.length === 0" class="card">Нет студентов — добавьте первого, используя форму выше.</div>
 
       <div v-else>
         <div v-for="s in students" :key="s.login" class="card">
-          <div style="display:flex;justify-content:space-between;align-items:center">
+          <div class="flex-between">
             <div>
               <b>{{s.login}}</b> — XP {{s.xp}}
-              <div style="margin-top:8px">
+              <div style="margin-top:var(--spacing-xs)">
                 <span v-for="b in s.badges" :key="b" class="badge">
                   <span class="icon">{{badgeIconFromTitle(b)}}</span>
                   <span>{{b}}</span>
                 </span>
               </div>
             </div>
-            <div style="display:flex;flex-direction:column;gap:8px">
+            <div class="flex-column">
               <button @click="openBadgeModal(s.login)">Выдать ачивку</button>
             </div>
           </div>
@@ -297,7 +796,9 @@
       </div>
     </div>
 
-    <!-- Badge selection modal (teacher) -->
+    <!-- ============================================
+         МОДАЛЬНОЕ ОКНО ВЫБОРА АЧИВКИ
+         ============================================ -->
     <div v-if="showBadgeModal" class="modal-backdrop" @click.self="closeBadgeModal">
       <div class="modal">
         <h4>Выдать ачивку студенту {{badgeTargetStudent}}</h4>
@@ -307,7 +808,7 @@
                :class="['badge-option', {selected: selectedBadgeId === b.id}]"
                @click="selectedBadgeId = b.id">
             <span class="badge-icon">{{b.icon || b.title.slice(0,2)}}</span>
-            <div style="display:flex;flex-direction:column;align-items:flex-start">
+            <div class="flex-column" style="align-items:flex-start">
               <strong>{{b.title}}</strong>
               <small style="opacity:.7">{{b.id}}</small>
             </div>
@@ -328,6 +829,9 @@ const { createApp } = Vue;
 createApp({
   data() {
     return {
+      // ============================================
+      // КОНФИГУРАЦИЯ API
+      // ============================================
       endpoints: {
         tasks: 'http://localhost:3001/tasks',
         tasksImgsBase: '',
@@ -335,83 +839,176 @@ createApp({
         teacherApi: 'http://localhost:3003',
       },
 
-      login:'', role:'student', user:null,
-      students:null, newStudent:'',
-      xp:0, level:1, streak:0, combo:1, earned:0,
-      activeTask:null, shuffled:[], drag:null, result:null, resultOk:false,
-      tasks: [], imgBase: '', teacherError: '',
+      // ============================================
+      // СОСТОЯНИЕ АВТОРИЗАЦИИ
+      // ============================================
+      login: '',
+      role: 'student',
+      user: null,
 
-      // drag state
+      // ============================================
+      // СОСТОЯНИЕ СТУДЕНТА
+      // ============================================
+      xp: 0,
+      level: 1,
+      streak: 0,
+      combo: 1,
+      earned: 0,
+      activeTask: null,
+      shuffled: [],
+      result: null,
+      resultOk: false,
+      tasks: [],
+      imgBase: '',
+
+      // ============================================
+      // СОСТОЯНИЕ DRAG AND DROP
+      // ============================================
+      drag: null,
       dragOver: null,
       draggingItem: null,
+      scrollAnimationFrame: null, // ID анимации для автоматического скролла
+      currentDragPosition: null, // Текущая позиция курсора/касания при перетаскивании
 
-      // badges
+      // ============================================
+      // СОСТОЯНИЕ ПРЕПОДАВАТЕЛЯ
+      // ============================================
+      students: null,
+      newStudent: '',
+      teacherError: '',
+
+      // ============================================
+      // СОСТОЯНИЕ БЕЙДЖЕЙ
+      // ============================================
       availableBadges: [],
       showBadgeModal: false,
       badgeTargetStudent: null,
       selectedBadgeId: null,
-
-      // create badge inputs
-      newBadgeId: '', newBadgeTitle: '', newBadgeIcon: '',
-
-      // touch ghost element ref
-      touchGhost: null
+      newBadgeId: '',
+      newBadgeTitle: '',
+      newBadgeIcon: '',
     };
   },
+
   computed: {
-    progress(){ return Math.min(100, Math.floor(this.xp/10)); },
-    completedSet() { return new Set((this.user && this.user.completedTasks) || []); }
+    // Прогресс в процентах (максимум 100%)
+    progress() {
+      return Math.min(100, Math.floor(this.xp / 10));
+    },
+
+    // Множество завершенных заданий для быстрой проверки
+    completedSet() {
+      return new Set((this.user && this.user.completedTasks) || []);
+    }
   },
+
   methods: {
+    // ============================================
+    // УТИЛИТЫ ДЛЯ РАБОТЫ С API
+    // ============================================
+    /**
+     * Безопасный fetch с обработкой ошибок
+     * @param {string} url - URL для запроса
+     * @param {object} opts - Опции fetch
+     * @returns {Promise<object>} Результат запроса
+     */
     async fetchSafe(url, opts) {
       try {
         const res = await fetch(url, opts);
         const text = await res.text();
         let json = null;
-        try { json = JSON.parse(text); } catch(e) { json = null; }
+        try {
+          json = JSON.parse(text);
+        } catch (e) {
+          json = null;
+        }
         return { ok: res.ok, status: res.status, json, text };
       } catch (e) {
         return { ok: false, status: 0, json: null, text: String(e) };
       }
     },
 
-    // AUTH
-    async auth(){
-      if(!this.login) return alert('Введите логин');
-      if(this.role === 'student'){
+    // ============================================
+    // АВТОРИЗАЦИЯ
+    // ============================================
+    /**
+     * Авторизация студента или преподавателя
+     */
+    async auth() {
+      if (!this.login) return alert('Введите логин');
+
+      if (this.role === 'student') {
+        // Авторизация студента
         const url = this.endpoints.studentsApi + '/students';
         const res = await this.fetchSafe(url, {
           method: 'POST',
-          headers: {'Content-Type':'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ login: this.login })
         });
-        if (!res.ok) { alert('Ошибка авторизации: ' + (res.json?.error || res.text)); return; }
-        const user = res.json || (() => { try { return JSON.parse(res.text); } catch { return null; } })();
-        if (!user) { alert('Неверный ответ от сервера: ' + res.text); return; }
+
+        if (!res.ok) {
+          alert('Ошибка авторизации: ' + (res.json?.error || res.text));
+          return;
+        }
+
+        const user = res.json || (() => {
+          try {
+            return JSON.parse(res.text);
+          } catch {
+            return null;
+          }
+        })();
+
+        if (!user) {
+          alert('Неверный ответ от сервера: ' + res.text);
+          return;
+        }
+
         this.user = user;
         this.xp = user.xp || 0;
-        this.level = Math.floor(this.xp/50) + 1;
+        this.level = Math.floor(this.xp / 50) + 1;
         await this.loadTasks();
-        await this.loadAvailableBadges(); // icons for student's badges
+        await this.loadAvailableBadges();
       } else {
-        // teacher
+        // Авторизация преподавателя
         this.students = null;
         const url = this.endpoints.teacherApi + '/teachers';
         const res = await this.fetchSafe(url, {
           method: 'POST',
-          headers: {'Content-Type':'application/json'},
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ login: this.login })
         });
-        if (!res.ok) { alert('Ошибка при входе как преподаватель: ' + (res.json?.error || res.text)); this.students = []; return; }
-        const teacher = res.json || (() => { try { return JSON.parse(res.text); } catch { return null; } })();
-        if (!teacher) { alert('Неверный ответ от teacher-service: ' + res.text); this.students = []; return; }
+
+        if (!res.ok) {
+          alert('Ошибка при входе как преподаватель: ' + (res.json?.error || res.text));
+          this.students = [];
+          return;
+        }
+
+        const teacher = res.json || (() => {
+          try {
+            return JSON.parse(res.text);
+          } catch {
+            return null;
+          }
+        })();
+
+        if (!teacher) {
+          alert('Неверный ответ от teacher-service: ' + res.text);
+          this.students = [];
+          return;
+        }
+
         this.user = teacher;
         await this.loadStudents();
         await this.loadAvailableBadges();
       }
     },
 
-    logout(){
+    /**
+     * Выход из системы
+     */
+    logout() {
       this.user = null;
       this.login = '';
       this.activeTask = null;
@@ -422,222 +1019,586 @@ createApp({
       this.showBadgeModal = false;
     },
 
-    // TASKS
-    async loadTasks(){
+    // ============================================
+    // РАБОТА С ЗАДАНИЯМИ
+    // ============================================
+    /**
+     * Загрузка списка заданий
+     */
+    async loadTasks() {
       const res = await this.fetchSafe(this.endpoints.tasks);
-      if (!res.ok) { alert('Не удалось загрузить задания: ' + (res.json?.error || res.text)); this.tasks = []; return; }
+      if (!res.ok) {
+        alert('Не удалось загрузить задания: ' + (res.json?.error || res.text));
+        this.tasks = [];
+        return;
+      }
+
       const data = res.json || (res.text ? JSON.parse(res.text || '{}') : {});
       this.tasks = data.tasks || [];
-      // use frontend origin for images by default
-      // tasks.json should contain relative img paths like "images/pic1.jpg"
+      // Используем origin фронтенда для изображений
       this.imgBase = window.location.origin + '/';
     },
 
-    startTask(t){
+    /**
+     * Начало выполнения задания
+     * @param {object} t - Задание
+     */
+    startTask(t) {
       this.activeTask = JSON.parse(JSON.stringify(t));
-      this.result = null; this.resultOk = false;
-      this.dragOver = null; this.draggingItem = null;
-      if(t.type === 'match') this.shuffled = [...t.data].sort(()=>Math.random() - .5);
-      if(t.type === 'triple') this.shuffled = [...t.data].map(d=>({text:d.text})).sort(()=>Math.random() - .5);
+      this.result = null;
+      this.resultOk = false;
+      this.dragOver = null;
+      this.draggingItem = null;
+
+      // Перемешиваем элементы в зависимости от типа задания
+      if (t.type === 'match') {
+        this.shuffled = [...t.data].sort(() => Math.random() - 0.5);
+      }
+      if (t.type === 'triple') {
+        this.shuffled = [...t.data].map(d => ({ text: d.text })).sort(() => Math.random() - 0.5);
+      }
     },
 
-    // DRAG HELPERS (desktop)
-    dragStart(w){
+    /**
+     * Отправка задания на проверку
+     */
+    async submitTask() {
+      let ok = true;
+      const t = this.activeTask;
+      if (!t) return;
+
+      // Проверка в зависимости от типа задания
+      if (t.type === 'match') {
+        t.data.forEach(d => {
+          if (d.answer !== d.en) ok = false;
+        });
+      }
+      if (t.type === 'fill') {
+        t.data.forEach(d => {
+          if ((d.user || '').trim() !== (d.answer || '').trim()) ok = false;
+        });
+      }
+      if (t.type === 'table') {
+        t.data.forEach(d => {
+          if ((d.reg || '').trim() === '' && (d.irreg || '').trim() === '') ok = false;
+        });
+      }
+      if (t.type === 'triple') {
+        t.data.forEach(d => {
+          if (d.answer !== d.text) ok = false;
+        });
+      }
+
+      this.resultOk = ok;
+
+      if (ok) {
+        // Успешное выполнение
+        this.earned = 20 * this.combo;
+        this.xp += this.earned;
+        this.combo++;
+        this.streak++;
+        this.result = 'Успешно!';
+
+        if (!this.user.completedTasks) this.user.completedTasks = [];
+        if (!this.user.completedTasks.includes(t.id)) {
+          this.user.completedTasks.push(t.id);
+        }
+
+        // Сохранение прогресса на сервере
+        const url = `${this.endpoints.studentsApi}/students/${encodeURIComponent(this.user.login)}`;
+        const res = await this.fetchSafe(url, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            xp: this.xp,
+            completedTasks: this.user.completedTasks,
+            badges: this.user.badges || []
+          })
+        });
+
+        if (!res.ok) {
+          console.warn('Failed to persist student progress:', res.status, res.text);
+          alert('Не удалось сохранить прогресс на сервере: ' + (res.json?.error || res.text));
+        }
+      } else {
+        // Неудачное выполнение
+        this.combo = 1;
+        this.streak = 0;
+        this.earned = 0;
+        this.result = 'Попробуйте снова';
+      }
+
+      this.level = Math.floor(this.xp / 50) + 1;
+      this.activeTask = null;
+    },
+
+    /**
+     * Закрытие результата
+     */
+    closeResult() {
+      this.result = null;
+    },
+
+    // ============================================
+    // АВТОМАТИЧЕСКИЙ СКРОЛЛ ПРИ ПЕРЕТАСКИВАНИИ
+    // ============================================
+    /**
+     * Остановка автоматического скролла
+     */
+    stopAutoScroll() {
+      if (this.scrollAnimationFrame !== null) {
+        cancelAnimationFrame(this.scrollAnimationFrame);
+        this.scrollAnimationFrame = null;
+      }
+      this.currentDragPosition = null;
+    },
+
+    /**
+     * Автоматический скролл при приближении к краю экрана
+     * @param {number} x - X координата курсора/касания
+     * @param {number} y - Y координата курсора/касания
+     */
+    autoScroll(x, y) {
+      this.currentDragPosition = { x, y };
+      
+      // Останавливаем предыдущую анимацию, если есть
+      if (this.scrollAnimationFrame !== null) {
+        cancelAnimationFrame(this.scrollAnimationFrame);
+      }
+      
+      // Запускаем цикл скролла
+      const scrollLoop = () => {
+        if (!this.currentDragPosition || (!this.drag && !this.touchDragItem)) {
+          this.scrollAnimationFrame = null;
+          return;
+        }
+        
+        const { x, y } = this.currentDragPosition;
+        
+        // Зона активации скролла (в пикселях от края)
+        const scrollZone = 80;
+        const scrollSpeed = 15; // Скорость скролла
+        
+        const windowHeight = window.innerHeight;
+        const windowWidth = window.innerWidth;
+        
+        let scrollX = 0;
+        let scrollY = 0;
+        
+        // Проверка вертикального скролла
+        if (y < scrollZone) {
+          // Скролл вверх (чем ближе к верху, тем быстрее)
+          const factor = Math.max(0, 1 - y / scrollZone);
+          scrollY = -scrollSpeed * factor;
+        } else if (y > windowHeight - scrollZone) {
+          // Скролл вниз (чем ближе к низу, тем быстрее)
+          const factor = Math.max(0, 1 - (windowHeight - y) / scrollZone);
+          scrollY = scrollSpeed * factor;
+        }
+        
+        // Проверка горизонтального скролла
+        if (x < scrollZone) {
+          const factor = Math.max(0, 1 - x / scrollZone);
+          scrollX = -scrollSpeed * factor;
+        } else if (x > windowWidth - scrollZone) {
+          const factor = Math.max(0, 1 - (windowWidth - x) / scrollZone);
+          scrollX = scrollSpeed * factor;
+        }
+        
+        // Применяем скролл
+        if (scrollY !== 0 || scrollX !== 0) {
+          // Скролл окна
+          window.scrollBy({
+            top: scrollY,
+            left: scrollX,
+            behavior: 'auto'
+          });
+          
+          // Скролл всех скроллируемых контейнеров
+          const scrollableElements = document.querySelectorAll('.card, .container');
+          scrollableElements.forEach(el => {
+            if (el.scrollHeight > el.clientHeight && scrollY !== 0) {
+              el.scrollTop += scrollY;
+            }
+            if (el.scrollWidth > el.clientWidth && scrollX !== 0) {
+              el.scrollLeft += scrollX;
+            }
+          });
+        }
+        
+        // Продолжаем цикл
+        this.scrollAnimationFrame = requestAnimationFrame(scrollLoop);
+      };
+      
+      // Запускаем цикл
+      this.scrollAnimationFrame = requestAnimationFrame(scrollLoop);
+    },
+
+    // ============================================
+    // DRAG AND DROP (DESKTOP)
+    // ============================================
+    /**
+     * Начало перетаскивания (desktop)
+     * @param {object} w - Элемент для перетаскивания
+     */
+    dragStart(w) {
       this.drag = w;
       this.draggingItem = w.en || w.text || null;
+      this.currentDragPosition = null;
     },
-    dragEnd(){
+
+    /**
+     * Конец перетаскивания (desktop)
+     */
+    dragEnd() {
+      this.stopAutoScroll();
       this.drag = null;
       this.draggingItem = null;
       this.dragOver = null;
     },
-    dragEnter(z){
+
+    /**
+     * Вход в зону перетаскивания
+     * @param {object} z - Зона перетаскивания
+     */
+    dragEnter(z) {
       this.dragOver = z;
     },
-    dragLeave(z){
-      if(this.dragOver === z) this.dragOver = null;
+
+    /**
+     * Выход из зоны перетаскивания
+     * @param {object} z - Зона перетаскивания
+     */
+    dragLeave(z) {
+      if (this.dragOver === z) this.dragOver = null;
     },
-    drop(index){
-      if(this.drag) {
+
+    /**
+     * Обработка движения при перетаскивании (desktop)
+     * @param {Event} e - Событие dragover
+     */
+    dragOverHandler(e) {
+      if (this.drag) {
+        // Обновляем позицию для автоматического скролла
+        this.autoScroll(e.clientX, e.clientY);
+      }
+    },
+
+    /**
+     * Сброс элемента в зону
+     * @param {number} index - Индекс зоны
+     */
+    drop(index) {
+      if (this.drag) {
         const target = this.activeTask.data[index];
         target.answer = this.drag.en || this.drag.text || '';
       }
-      this.drag = null; this.draggingItem = null; this.dragOver = null;
-    },
-    dropFinalize(){
-      this.drag = null; this.draggingItem = null; this.dragOver = null;
+      this.stopAutoScroll();
+      this.drag = null;
+      this.draggingItem = null;
+      this.dragOver = null;
     },
 
-    // TOUCH support for mobile (simulate drag)
-    touchStart(item, e){
+    // ============================================
+    // TOUCH SUPPORT (MOBILE + MULTITOUCH)
+    // ============================================
+    /**
+     * Начало касания (поддержка мультитача)
+     * @param {object} item - Элемент для перетаскивания
+     * @param {Event} e - Событие touch
+     */
+    touchStart(item, e) {
       const t = e.touches && e.touches[0];
+      if (!t) return;
+
+      this.touchDragItem = item;
       this.drag = item;
       this.draggingItem = item.en || item.text || null;
-      this.createTouchGhost(this.draggingItem, t ? t.clientX : null, t ? t.clientY : null);
+      this.touchStartPos = { x: t.clientX, y: t.clientY };
+      this.currentDragPosition = { x: t.clientX, y: t.clientY };
+
+      // Создаем визуальный призрак
+      this.createTouchGhost(this.draggingItem, t.clientX, t.clientY);
     },
-    touchMove(e){
+
+    /**
+     * Движение касания (с поддержкой скролла при мультитаче и автоматическим скроллом)
+     * @param {Event} e - Событие touch
+     */
+    touchMove(e) {
       const t = e.touches && e.touches[0];
-      if(!t) return;
+      if (!t || !this.touchDragItem) return;
+
+      // Если есть несколько касаний, разрешаем скролл вторым пальцем
+      if (e.touches.length > 1) {
+        // Второй палец может скроллить - не обрабатываем перетаскивание
+        return;
+      }
+
+      // Обновляем позицию для автоматического скролла
+      this.autoScroll(t.clientX, t.clientY);
+
+      // Обновляем позицию визуального призрака
       this.moveTouchGhost(t.clientX, t.clientY);
+
+      // Проверяем, над какой зоной перетаскивания мы находимся
       const el = document.elementFromPoint(t.clientX, t.clientY);
       const dz = el ? el.closest && el.closest('.dropzone') : null;
-      if(dz && dz.dataset && typeof dz.dataset.dropIndex !== 'undefined'){
+
+      if (dz && dz.dataset && typeof dz.dataset.dropIndex !== 'undefined') {
         const idx = Number(dz.dataset.dropIndex);
         this.dragOver = this.activeTask && this.activeTask.data ? this.activeTask.data[idx] : null;
       } else {
         this.dragOver = null;
       }
+
+      // Предотвращаем стандартный скролл при перетаскивании одним пальцем
+      // (автоматический скролл будет работать через autoScroll)
+      e.preventDefault();
     },
-    touchEnd(e){
+
+    /**
+     * Конец касания
+     * @param {Event} e - Событие touch
+     */
+    touchEnd(e) {
       const t = (e.changedTouches && e.changedTouches[0]) || null;
       let dropped = false;
-      if(t){
+
+      if (t && this.touchDragItem) {
         const el = document.elementFromPoint(t.clientX, t.clientY);
         const dz = el ? el.closest && el.closest('.dropzone') : null;
-        if(dz && dz.dataset && typeof dz.dataset.dropIndex !== 'undefined'){
+
+        if (dz && dz.dataset && typeof dz.dataset.dropIndex !== 'undefined') {
           const idx = Number(dz.dataset.dropIndex);
-          if(this.drag){
+          if (this.drag) {
             const target = this.activeTask.data[idx];
             target.answer = this.drag.en || this.drag.text || '';
             dropped = true;
           }
         }
       }
+
+      // Очистка
+      this.stopAutoScroll();
       this.removeTouchGhost();
       this.drag = null;
       this.draggingItem = null;
       this.dragOver = null;
-      // keep filled highlight where answer was set (via target.answer)
+      this.touchDragItem = null;
+      this.touchStartPos = null;
     },
-    createTouchGhost(text, x = null, y = null){
+
+    /**
+     * Создание визуального призрака для touch
+     * @param {string} text - Текст призрака
+     * @param {number} x - X координата
+     * @param {number} y - Y координата
+     */
+    createTouchGhost(text, x = null, y = null) {
       this.removeTouchGhost();
       const g = document.createElement('div');
       g.className = 'touch-ghost';
       g.textContent = text || '';
       document.body.appendChild(g);
       this.touchGhost = g;
-      if(x !== null && y !== null){
+
+      if (x !== null && y !== null) {
         g.style.left = x + 'px';
         g.style.top = y + 'px';
       }
     },
-    moveTouchGhost(x, y){
-      if(!this.touchGhost) return;
-      this.touchGhost.style.left = (x + 14) + 'px';
-      this.touchGhost.style.top = (y + 14) + 'px';
+
+    /**
+     * Перемещение визуального призрака
+     * @param {number} x - X координата
+     * @param {number} y - Y координата
+     */
+    moveTouchGhost(x, y) {
+      if (!this.touchGhost) return;
+      this.touchGhost.style.left = x + 'px';
+      this.touchGhost.style.top = y + 'px';
     },
-    removeTouchGhost(){
-      if(this.touchGhost && this.touchGhost.parentNode) {
+
+    /**
+     * Удаление визуального призрака
+     */
+    removeTouchGhost() {
+      if (this.touchGhost && this.touchGhost.parentNode) {
         this.touchGhost.parentNode.removeChild(this.touchGhost);
       }
       this.touchGhost = null;
     },
 
-    async submitTask(){
-      let ok = true;
-      const t = this.activeTask;
-      if(!t) return;
-      if(t.type==='match'){ t.data.forEach(d => { if(d.answer!==d.en) ok=false }); }
-      if(t.type==='fill'){ t.data.forEach(d => { if((d.user||'').trim() !== (d.answer||'').trim()) ok=false }); }
-      if(t.type==='table'){ t.data.forEach(d => { if((d.reg||'').trim()==='' && (d.irreg||'').trim()==='') ok=false }); }
-      if(t.type==='triple'){ t.data.forEach(d => { if(d.answer !== d.text) ok=false }); }
-
-      this.resultOk = ok;
-      if(ok){
-        this.earned = 20 * this.combo;
-        this.xp += this.earned; this.combo++; this.streak++; this.result = 'Успешно!';
-        if(!this.user.completedTasks) this.user.completedTasks = [];
-        if(!this.user.completedTasks.includes(t.id)) this.user.completedTasks.push(t.id);
-        const url = `${this.endpoints.studentsApi}/students/${encodeURIComponent(this.user.login)}`;
-        const res = await this.fetchSafe(url, {
-          method: 'PUT',
-          headers: {'Content-Type':'application/json'},
-          body: JSON.stringify({ xp: this.xp, completedTasks: this.user.completedTasks, badges: this.user.badges || [] })
-        });
-        if (!res.ok) { console.warn('Failed to persist student progress:', res.status, res.text); alert('Не удалось сохранить прогресс на сервере: ' + (res.json?.error || res.text)); }
-      } else {
-        this.combo = 1; this.streak = 0; this.earned = 0; this.result = 'Попробуйте снова';
-      }
-      this.level = Math.floor(this.xp/50) + 1;
-      this.activeTask = null;
-    },
-
-    closeResult(){ this.result = null; },
-
-    // TEACHER: students & badges
-    async loadStudents(){
+    // ============================================
+    // ФУНКЦИИ ПРЕПОДАВАТЕЛЯ
+    // ============================================
+    /**
+     * Загрузка списка студентов
+     */
+    async loadStudents() {
       this.teacherError = '';
       const res = await this.fetchSafe(this.endpoints.teacherApi + '/students');
-      if (!res.ok) { this.students = []; this.teacherError = (res.json?.error) ? res.json.error : res.text || 'Unknown error'; return; }
-      try { this.students = JSON.parse(JSON.stringify(res.json || [])); } catch(e) { this.students = []; this.teacherError = 'Invalid students data'; }
+      if (!res.ok) {
+        this.students = [];
+        this.teacherError = (res.json?.error) ? res.json.error : res.text || 'Unknown error';
+        return;
+      }
+
+      try {
+        this.students = JSON.parse(JSON.stringify(res.json || []));
+      } catch (e) {
+        this.students = [];
+        this.teacherError = 'Invalid students data';
+      }
     },
 
-    async addStudent(){
-      if(!this.newStudent) return;
+    /**
+     * Добавление нового студента
+     */
+    async addStudent() {
+      if (!this.newStudent) return;
+
       const res = await this.fetchSafe(this.endpoints.studentsApi + '/students', {
-        method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ login: this.newStudent })
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ login: this.newStudent })
       });
-      if (!res.ok) { alert('Ошибка при создании студента: ' + (res.json?.error || res.text)); return; }
-      this.newStudent = ''; await this.loadStudents();
+
+      if (!res.ok) {
+        alert('Ошибка при создании студента: ' + (res.json?.error || res.text));
+        return;
+      }
+
+      this.newStudent = '';
+      await this.loadStudents();
     },
 
-    async loadAvailableBadges(){
+    // ============================================
+    // РАБОТА С БЕЙДЖАМИ
+    // ============================================
+    /**
+     * Загрузка доступных бейджей
+     */
+    async loadAvailableBadges() {
       const res = await this.fetchSafe(this.endpoints.teacherApi + '/badges');
-      if (!res.ok) { this.availableBadges = []; return; }
+      if (!res.ok) {
+        this.availableBadges = [];
+        return;
+      }
+
       this.availableBadges = res.json || [];
-      if (!this.selectedBadgeId && this.availableBadges.length) this.selectedBadgeId = this.availableBadges[0].id;
+      if (!this.selectedBadgeId && this.availableBadges.length) {
+        this.selectedBadgeId = this.availableBadges[0].id;
+      }
     },
 
-    openBadgeModal(login){
+    /**
+     * Открытие модального окна выбора бейджа
+     * @param {string} login - Логин студента
+     */
+    openBadgeModal(login) {
       this.badgeTargetStudent = login;
       this.selectedBadgeId = this.availableBadges.length ? this.availableBadges[0].id : null;
       this.showBadgeModal = true;
     },
 
-    closeBadgeModal(){
-      this.showBadgeModal = false; this.badgeTargetStudent = null; this.selectedBadgeId = null;
+    /**
+     * Закрытие модального окна выбора бейджа
+     */
+    closeBadgeModal() {
+      this.showBadgeModal = false;
+      this.badgeTargetStudent = null;
+      this.selectedBadgeId = null;
     },
 
-    badgeIconFromTitle(title){
+    /**
+     * Получение иконки бейджа по названию
+     * @param {string} title - Название бейджа
+     * @returns {string} Иконка
+     */
+    badgeIconFromTitle(title) {
       const b = this.availableBadges.find(x => x.title === title);
-      return b ? (b.icon || title.slice(0,2)) : title.slice(0,2);
+      return b ? (b.icon || title.slice(0, 2)) : title.slice(0, 2);
     },
 
-    async confirmGiveBadge(){
-      if(!this.badgeTargetStudent || !this.selectedBadgeId) return;
+    /**
+     * Подтверждение выдачи бейджа
+     */
+    async confirmGiveBadge() {
+      if (!this.badgeTargetStudent || !this.selectedBadgeId) return;
+
       const badgeObj = this.availableBadges.find(b => b.id === this.selectedBadgeId);
       const badgeTitle = badgeObj ? badgeObj.title : this.selectedBadgeId;
-      const res = await this.fetchSafe(`${this.endpoints.teacherApi}/students/${encodeURIComponent(this.badgeTargetStudent)}/badges`, {
-        method: 'POST',
-        headers: {'Content-Type':'application/json'},
-        body: JSON.stringify({ badge: badgeTitle })
-      });
-      if (!res.ok) { alert('Не удалось выдать ачивку: ' + (res.json?.error || res.text)); return; }
+
+      const res = await this.fetchSafe(
+        `${this.endpoints.teacherApi}/students/${encodeURIComponent(this.badgeTargetStudent)}/badges`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ badge: badgeTitle })
+        }
+      );
+
+      if (!res.ok) {
+        alert('Не удалось выдать ачивку: ' + (res.json?.error || res.text));
+        return;
+      }
+
       await this.loadStudents();
       this.closeBadgeModal();
     },
 
-    async giveBadge(login){
-      this.openBadgeModal(login);
-    },
+    /**
+     * Создание нового бейджа
+     */
+    async createBadge() {
+      if (!this.newBadgeId || !this.newBadgeTitle) {
+        alert('Введите id и название');
+        return;
+      }
 
-    // CREATE BADGE
-    async createBadge(){
-      if(!this.newBadgeId || !this.newBadgeTitle) { alert('Введите id и название'); return; }
-      const payload = { id: this.newBadgeId, title: this.newBadgeTitle, icon: this.newBadgeIcon || '' };
+      const payload = {
+        id: this.newBadgeId,
+        title: this.newBadgeTitle,
+        icon: this.newBadgeIcon || ''
+      };
+
       const res = await this.fetchSafe(this.endpoints.teacherApi + '/badges', {
         method: 'POST',
-        headers: {'Content-Type':'application/json'}, body: JSON.stringify(payload)
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
-      if (!res.ok) { alert('Не удалось создать бейдж: ' + (res.json?.error || res.text)); return; }
+
+      if (!res.ok) {
+        alert('Не удалось создать бейдж: ' + (res.json?.error || res.text));
+        return;
+      }
+
       await this.loadAvailableBadges();
-      this.newBadgeId = ''; this.newBadgeTitle = ''; this.newBadgeIcon = '';
+      this.newBadgeId = '';
+      this.newBadgeTitle = '';
+      this.newBadgeIcon = '';
       alert('Бейдж создан');
     }
   },
-  mounted(){
-    try { console.log('[frontend] app mounted, Vue.compile =', typeof Vue.compile); } catch(e){}
-    try { window.__APP = this; } catch(e){}
+
+  mounted() {
+    try {
+      console.log('[frontend] app mounted, Vue.compile =', typeof Vue.compile);
+    } catch (e) {}
+    try {
+      window.__APP = this;
+    } catch (e) {}
+
+    // Глобальный обработчик dragover для автоматического скролла (desktop)
+    // Работает когда курсор не над dropzone, но перетаскивание активно
+    document.addEventListener('dragover', (e) => {
+      if (this.drag) {
+        // Обновляем позицию для автоматического скролла
+        this.autoScroll(e.clientX, e.clientY);
+      }
+    }, { passive: false });
   }
 }).mount('#app');
 </script>
