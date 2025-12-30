@@ -832,12 +832,26 @@ createApp({
       // ============================================
       // КОНФИГУРАЦИЯ API
       // ============================================
-      endpoints: {
-        tasks: 'http://localhost:3001/tasks',
-        tasksImgsBase: '',
-        studentsApi: 'http://localhost:3002',
-        teacherApi: 'http://localhost:3003',
-      },
+      // Автоматическое определение базового URL (локально или на сервере через прокси)
+      // На сервере используется прокси /english-project/api/*
+      // Для локальной разработки используется прямой доступ к localhost:PORT
+      endpoints: (() => {
+        // Определяем, работаем ли мы локально или на сервере
+        const hostname = window.location.hostname;
+        
+        // Локально: hostname localhost или 127.0.0.1
+        // На сервере: любой другой hostname (будет использоваться прокси)
+        const isLocalhost = hostname === 'localhost' || hostname === '127.0.0.1' || hostname === 'english-project.loc';
+        const basePath = '/english-project/api';
+        
+        return {
+          tasks: isLocalhost ? 'http://localhost:3001/tasks' : `${basePath}/tasks`,
+          tasksImgsBase: '',
+          studentsApi: isLocalhost ? 'http://localhost:3002' : `${basePath}/students`,
+          teacherApi: isLocalhost ? 'http://localhost:3003' : `${basePath}/teachers`,
+          badgesApi: isLocalhost ? 'http://localhost:3004/badges' : `${basePath}/badges`,
+        };
+      })(),
 
       // ============================================
       // СОСТОЯНИЕ АВТОРИЗАЦИИ
@@ -1481,7 +1495,7 @@ createApp({
      * Загрузка доступных бейджей
      */
     async loadAvailableBadges() {
-      const res = await this.fetchSafe(this.endpoints.teacherApi + '/badges');
+      const res = await this.fetchSafe(this.endpoints.badgesApi);
       if (!res.ok) {
         this.availableBadges = [];
         return;
@@ -1564,7 +1578,7 @@ createApp({
         icon: this.newBadgeIcon || ''
       };
 
-      const res = await this.fetchSafe(this.endpoints.teacherApi + '/badges', {
+      const res = await this.fetchSafe(this.endpoints.badgesApi, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
