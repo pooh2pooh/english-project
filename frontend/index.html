@@ -847,9 +847,14 @@ createApp({
         return {
           tasks: isLocalhost ? 'http://localhost:3001/tasks' : `${basePath}/tasks`,
           tasksImgsBase: '',
+          // Локально: базовый URL сервиса (к нему добавляется путь в коде)
+          // На сервере: базовый URL прокси (к нему добавляется путь в коде)
+          // Прокси /english-project/api/students перенаправляет на http://127.0.0.1:3002
+          // Для доступа к /students на сервере нужно использовать /english-project/api/students/students
           studentsApi: isLocalhost ? 'http://localhost:3002' : `${basePath}/students`,
           teacherApi: isLocalhost ? 'http://localhost:3003' : `${basePath}/teachers`,
           badgesApi: isLocalhost ? 'http://localhost:3004/badges' : `${basePath}/badges`,
+          isLocalhost: isLocalhost,
         };
       })(),
 
@@ -953,7 +958,11 @@ createApp({
 
       if (this.role === 'student') {
         // Авторизация студента
-        const url = this.endpoints.studentsApi + '/students';
+        // На сервере прокси /english-project/api/students перенаправляет на http://127.0.0.1:3002
+        // Для доступа к /students нужно использовать /english-project/api/students/students
+        const url = this.endpoints.isLocalhost 
+          ? this.endpoints.studentsApi + '/students' 
+          : this.endpoints.studentsApi + '/students';
         const res = await this.fetchSafe(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -985,8 +994,12 @@ createApp({
         await this.loadAvailableBadges();
       } else {
         // Авторизация преподавателя
+        // На сервере прокси /english-project/api/teachers перенаправляет на http://127.0.0.1:3003
+        // Для доступа к /teachers нужно использовать /english-project/api/teachers/teachers
         this.students = null;
-        const url = this.endpoints.teacherApi + '/teachers';
+        const url = this.endpoints.isLocalhost 
+          ? this.endpoints.teacherApi + '/teachers' 
+          : this.endpoints.teacherApi + '/teachers';
         const res = await this.fetchSafe(url, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -1119,6 +1132,8 @@ createApp({
         }
 
         // Сохранение прогресса на сервере
+        // На сервере studentsApi = /english-project/api/students, добавляем /students/${login}
+        // Локально studentsApi = http://localhost:3002, добавляем /students/${login}
         const url = `${this.endpoints.studentsApi}/students/${encodeURIComponent(this.user.login)}`;
         const res = await this.fetchSafe(url, {
           method: 'PUT',
